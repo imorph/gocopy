@@ -1,6 +1,7 @@
 package main
 
 import (
+	//"bufio"
 	"io"
 	"os"
 	"strings"
@@ -15,19 +16,23 @@ func copyFile(from string, to string, offset int64, limit int64) error {
 	if err != nil {
 		return errors.Wrapf(err, "open file %s failed", from)
 	}
-	toFile, err := os.Create(to)
-	if err != nil {
-		return errors.Wrapf(err, "open file %s failed", to)
-	}
-	// Close() may return error, how to properly check it?
 	defer fromFile.Close()
-	defer toFile.Close()
 
 	// get file info to determine file size
 	ffi, err := fromFile.Stat()
 	if err != nil {
 		return errors.Wrapf(err, "can't get stats for file file %s", from)
 	}
+	if ffi.Size() < limit+offset {
+		return errors.Errorf("Can not copy, %vb + %vb is bigger than %s size (which is %vb)", limit, offset, from, ffi.Size())
+	}
+
+	toFile, err := os.Create(to)
+	if err != nil {
+		return errors.Wrapf(err, "open file %s failed", to)
+	}
+	defer toFile.Close()
+
 	var pBarLimit int64
 	switch ffSize := ffi.Size(); {
 	case ffSize > offset+limit:
@@ -64,3 +69,7 @@ func copyFile(from string, to string, offset int64, limit int64) error {
 
 	return nil
 }
+
+// func copyRW(writer io.Writer, reader io.Reader) (written int64, err error) {
+
+// }

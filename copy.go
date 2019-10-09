@@ -1,7 +1,6 @@
 package main
 
 import (
-	//"bufio"
 	"io"
 	"os"
 	"strings"
@@ -69,7 +68,3 @@ func copyFile(from string, to string, offset int64, limit int64) error {
 
 	return nil
 }
-
-// func copyRW(writer io.Writer, reader io.Reader) (written int64, err error) {
-
-// }
